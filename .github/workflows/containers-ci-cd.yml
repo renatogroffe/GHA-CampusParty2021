@@ -8,6 +8,7 @@ on:
 
 env:
   DIR_WEBAPP: ./SiteContagem
+  NOME_WEBAPP: groffecampusparty
   IMAGEM_DOCKERHUB: ${{ secrets.DOCKERHUB_USERNAME }}/sitecontagemcampus
   
 jobs:
@@ -34,3 +35,21 @@ jobs:
       run: |
         docker tag ${{ env.IMAGEM_DOCKERHUB }}:latest ${{ env.IMAGEM_DOCKERHUB }}:$GITHUB_RUN_NUMBER
         docker push --all-tags ${{ env.IMAGEM_DOCKERHUB }}
+
+
+  deployment-azwebapp:
+    needs: [build]
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Azure Login - Conectando com Credenciais no Azure
+      uses: Azure/login@v1.4.0
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Azure WebApp - Deployment da Aplicacao
+      uses: Azure/webapps-deploy@v2.2.3
+      with:
+        app-name: ${{ env.NOME_WEBAPP }}
+        images: '${{ env.IMAGEM_DOCKERHUB }}:${{ github.run_number }}'
