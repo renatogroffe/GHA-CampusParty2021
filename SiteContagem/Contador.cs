@@ -24,6 +24,7 @@ public class Contador
 
     public void Incrementar()
     {
-        _valorAtual++;
+        //_valorAtual++;
+        _valorAtual += 2;
     }
 }
